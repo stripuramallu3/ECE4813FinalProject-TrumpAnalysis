@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Donald Trump Sentiment on Twitter</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+<style> 
+<style type="text/css">
+    .table.table-striped {
+        width: 75%;
+        margin: 0 auto;
+        border-width: 1px;
+        background-color: rgba(150, 150, 150, 0.26);
+        border-color: #000000;
+    }
+  body {
+    /*background-color: rgba(245,243,242,1);*/
+    font-family: "Helvetica", sans-serif;
+    font-size: 10px;
+    margin: 8px;
+  }
+
+  svg {
+
+    /*border: solid 1px rgba(208,199,198,1);*/
+    position: relative;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+  }
+
+  .axis {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .x.axis path {
+    display: none;
+  }
+
+  .bar {
+    fill: steelblue; 
+    shape-rendering: crispEdges;
+    opacity:0.9;
+  }
+
+  .bar text {
+    fill: black;
+    font: 8px sans-serif;
+    text-anchor: middle;
+  } 
+  /* 
+  ISO Country code by regions: http://www.geohive.com/earth/gen_codes.aspx
+  */
+
+  /* Northern America */
+  .one, .eight {fill: #DF4949; background: #DF4949;}
+
+  /* Latin America and the Caribbean */
+  .two, .nine {fill: #E27A3F; background: #E27A3F;}
+
+  /* Europe */
+  .three, .ten { fill: #EFC94C; background: #EFC94C;}
+
+  /* Asia */
+  .four { fill: #9B59B6; background:  #9B59B6;}
+
+  /* Oceania */
+  .five {fill: #3498db; background: #3498db;}
+
+  /* Africa */
+  .six {fill: #F495A3; background: #F495A3;}
+
+  /* Unclassified */
+  .seven { fill: #45B29D; background: #45B29D;}
+
+</style>
+  <body>
+    <center>
+        <h1>Donald Trump Sentiment on Twitter</h1>
+    <br>
+	 <h4><a href="/">Home</a> | <a href="/distribution">View Sentiment Distribution</a> | <a href="/topten">View Top Ten Hastags</a> | <a href="/breakdown">View Sentiment Breakdown</a></h4>
+    </center>
+    <section id="graph"></section>
+    <script>
+    (function() {
+
+      // Fake JSON data
+      var json = {"countries_msg_vol": {
+        "CNN": 5, "Hannity": 5, "TrumpSexProbe": 6, "netneutrality": 6, "MAGA": 7, "MeToo": 8, "Israel": 11, "DentureDonald": 16, "Trump":  17, "Jerusalem": 24
+      }};
+      json = {{data| safe}}
+      console.log(json)
+      cleaned = {}
+     /*for (var i = 0; i < json.length; i++) {
+	var original = json[i][0]
+	var cleanedHashTag = ""; 
+	for (var j = 0; j < original.length; j++) {
+	    if ((original.charAt(j) >= 'a' && original.charAt(j) <= 'z') ||(original.charAt(j) >= 'A' && original.charAt(j) <= 'Z' )) {
+		cleanedHashTag += original.charAt(j);
+	    }
+	}
+	cleaned[cleanedHashTag] = json[i][1]
+      }*/
+      for (var i = 0; i < json.length; i++) {
+        cleaned[json[i][0]] = json[i][1]
+      }
+      json = cleaned
+      console.log(json)
+        // D3 Bubble Chart 
+
+        var diameter = 600;
+
+        var svg = d3.select('#graph').append('svg')
+                        .attr('width', diameter)
+                        .attr('height', diameter);
+
+        var bubble = d3.layout.pack()
+                    .size([diameter, diameter])
+                    .value(function(d) {return d.size;})
+             // .sort(function(a, b) {
+                    //  return -(a.value - b.value)
+                    // }) 
+                    .padding(3);
+      
+      // generate data with calculated layout values
+      var nodes = bubble.nodes(processData(json))
+                            .filter(function(d) { return !d.children; }); // filter out the outer bubble
+     
+      var vis = svg.selectAll('circle')
+                        .data(nodes);
+      
+      vis.enter().append('circle')
+                .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+                .attr('r', function(d) { return d.r; })
+                .attr('class', function(d) { return d.className; });
+
+      vis.enter().append('text')
+                .attr("x", function(d){ return d.x; })
+                .attr("y", function(d){ return d.y + 5; })
+                .attr("text-anchor", "middle")
+                .text(function(d){ return "#" + d.name + ": " + d.size })
+
+                .style({
+                          "fill":"white", 
+                          "font-family":"Helvetica Neue, Helvetica, Arial, san-serif",
+                          "font-size": "12px"
+                      });
+          
+      function processData(data) {
+        var obj = json;
+
+        var newDataSet = [];
+        var colors = ["one","two","three","four","five","six","seven","eight","nine","ten"];
+        var ind = 0;
+
+        for(var prop in obj) {
+          newDataSet.push({name: prop, className: colors[ind], size: obj[prop]});
+          ind++;
+        }
+        return {children: newDataSet};
+      }
+      
+    })();
+    </script>
+  </body>
+</html>
+

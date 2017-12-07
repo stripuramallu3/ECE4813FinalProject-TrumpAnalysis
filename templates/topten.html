@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Donald Trump Sentiment on Twitter</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+
+<style type="text/css">
+    .table.table-striped {
+        width: 75%;
+        margin: 0 auto;
+        border-width: 1px;
+        background-color: rgba(150, 150, 150, 0.26);
+        border-color: #000000;
+    }
+
+.card {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+.card {
+  margin-top: 10px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  background-clip: padding-box;
+  background-color: steelblue;
+  font-family: 'Armata', sans-serif;
+}
+.card span.card-title {
+    color: white;
+    font-size: 24px;
+    font-weight: 300;
+    text-transform: uppercase;
+    padding-left: 15px;
+    margin-top: 20px;
+    font-family: 'Armata', sans-serif;
+}
+.card .card-content {
+  padding: 16px;
+  border-radius: 0 0 2px 2px;
+  background-clip: padding-box;
+  box-sizing: border-box;
+  font-family: 'Armata', sans-serif;
+}
+.card .card-content p {
+  margin: 0;
+  color: white;
+}
+.card .card-content span.card-title {
+  line-height: 48px;
+}
+.card .card-action {
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 16px;
+}
+.card .card-action a {
+  color: #ffab40;
+  margin-right: 16px;
+  transition: color 0.3s ease;
+  text-transform: uppercase;
+}
+.card .card-action a:hover {
+  color: #ffd8a6;
+  text-decoration: none;
+}
+
+</style>
+
+<body>
+
+    <center>
+        <h1>Donald Trump Sentiment on Twitter</h1>
+    <br>
+    <h4><a href="/distribution">View Sentiment Distribution</a> | <a href="/topten">View Top Ten Hastags</a> | <a href="/breakdown">View Sentiment Breakdown</a></h4>
+    </center>
+    <div id='cards'></div>
+    <script>
+        function cleanString(input) {
+                var output = "";
+                for (var i=0; i<input.length; i++) {
+                        if (input.charCodeAt(i) <= 127) {
+                                output += input.charAt(i);
+                        }
+                }
+                return output;
+        }
+        var data = {{data| safe}}
+        console.log(data)
+	output = "<div class='row'>"
+	for (key in data) {
+		cardString = "<div class='col-sm-6'><div class='card'><div class='card-block'><h3 class='card-title'>" + key + "</h3>" + "<p class='card-text'>" + data[key] + "</p></div></div></div>"
+        output += cardString
+	} 
+	document.getElementById('cards').innerHTML = output; 
+
+          
+         
+          
+         
+        
+        </script>
+             
+
+</body>
+    
+</html>
+
+
+

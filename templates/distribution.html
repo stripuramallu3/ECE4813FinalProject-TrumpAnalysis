@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Donald Trump Sentiment on Twitter</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+</head>
+
+<style type="text/css">
+    .table.table-striped {
+        width: 75%;
+        margin: 0 auto;
+        border-width: 1px;
+        background-color: rgba(150, 150, 150, 0.26);
+        border-color: #000000;
+    }
+  body {
+    /*background-color: rgba(245,243,242,1);*/
+    font-family: "Helvetica", sans-serif;
+    font-size: 10px;
+    margin: 8px;
+  }
+
+  svg {
+    /*background-color: white;
+    position:center;
+    margin-right:auto;
+    margin-left: auto;
+    border: solid 1px rgba(208,199,198,1);*/
+    position: relative;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+  }
+
+  .axis {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .x.axis path {
+    display: none;
+  }
+
+  .bar {
+    fill: steelblue; 
+    shape-rendering: crispEdges;
+    opacity:0.9;
+  }
+
+  .bar text {
+    fill: black;
+    font: 8px sans-serif;
+    text-anchor: middle;
+  } 
+</style>
+
+<body>
+    <script>
+
+    </script>
+    <center>
+        <h1>Donald Trump Sentiment on Twitter</h1>
+    <br>
+	 <h4><a href="/">Home</a> | <a href="/distribution">View Sentiment Distribution</a> | <a href="/topten">View Top Ten Hastags</a> | <a href="/breakdown">View Sentiment Breakdown</a></h4>
+    </center> 
+   <script>
+	(function() {
+
+  var margin = {top: 20, right: 20, bottom: 80, left: 50},
+      width = 944 - margin.left - margin.right,
+      height = 480 - margin.top - margin.bottom;
+
+  var xSteps = 10,
+      xRange = d3.range(-xSteps/2, xSteps/2+1);
+
+  
+
+  var normalMean = 0.,
+      normalStdDev = 0.2;
+
+  var transitionDuration = 2;
+  var updateDelay = 1;
+
+  // Data
+
+  dataPoints = {{data}};
+  var minData = -5 // Math.min.apply(null, dataPoints)
+  var maxData = 5 //Math.max.apply(null, dataPoints)
+  for (i = 0; i < dataPoints.length; i++) {
+    dataPoints[i] = ((dataPoints[i] - minData)/(maxData - minData))-.5;
+    dataPoints[i] = dataPoints[i]*5
+  }
+  var numDataPoints = dataPoints.length
+  var yMax = numDataPoints/3;
+  console.log(dataPoints);
+
+  // Draw SVG
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // X scale
+  var x = d3.scale.ordinal()
+      .domain(xRange)
+      .rangeRoundBands([0, width], .1);
+
+  // X axis
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .append("text")
+	.style("text-anchor","end")
+	.attr("x",width)
+	.attr("y",30)
+	     // .attr("transform", "translate("+width+",  0 )")
+	.text("Distribution");
+
+  // Y scale
+  var y = d3.scale.linear()
+      .range([height, 0])
+      .domain([0, yMax]);
+
+  // Y axis  
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+  // Initial, empty histogram
+  var dataHist = d3.layout.histogram()
+    .bins(xRange)
+    ([]);
+
+  // Draw initial bars
+  var barRects = svg.selectAll("rect")
+      .data(dataHist)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("transform", function(d) { return "translate(" + x(d.x) 
+            + "," + y(d.y) + ")"; }) 
+      .attr("width", x.rangeBand())
+      .attr("height", function(d) { return height - y(d.y); });
+
+  // Draw walker number in top right
+  var walkNumText = svg.append("text")
+      .attr("id", "walk-num-text")
+      .style("text-anchor", "end")
+      .attr("x", width)
+      .attr("y", 4);
+
+  // Y Label
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Count");
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+function updateBars(i) {
+
+  setTimeout(function() {
+
+    // Slice to current i-step
+    var DataPointsSliced = dataPoints.slice(0, i);
+  
+    // Bin the data
+    var dataHist = d3.layout.histogram()
+      .bins(xRange) // .bins(20)
+      (DataPointsSliced);
+
+    d3.select('#walk-num-text').text(i + "/" + numDataPoints);
+
+    // Update bars
+    svg.selectAll("rect")
+        .data(dataHist)
+      .transition()
+        .duration(transitionDuration)
+        .ease("bounce")
+        .attr("transform", function(d) { return "translate(" + x(d.x) 
+              + "," + y(d.y) + ")"; })
+        .attr("height", function(d) { return height - y(d.y); });
+
+    i++;
+
+    if (i <= numDataPoints) {
+      updateBars(i);
+    }
+
+  }, updateDelay);
+
+}
+
+updateBars(0);
+
+})()
+   </script>
+
+</body>
+
+</html>
+
+
