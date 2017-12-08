@@ -36,7 +36,7 @@
   margin: 0 auto;                            
   position: relative;
   width: 360px;
-	}
+  }
   .tooltip {
   box-shadow: 0 0 5px #999999;
   display: none;
@@ -54,7 +54,7 @@
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   border-radius: 2px;
-	}
+  }
   
   .label {
    font-weight: 600;
@@ -66,7 +66,7 @@
     <center>
         <h1>Donald Trump Sentiment on Twitter</h1>
     <br>
-	 <h4><a href="/">Home</a> | <a href="/distribution">View Sentiment Distribution</a> | <a href="/topten">View Top Ten Hastags</a> | <a href="/breakdown">View Sentiment Breakdown</a></h4>
+   <h4><a href="/">Home</a> | <a href="/distribution">View Sentiment Distribution</a> | <a href="/topten">View Top Ten Hastags</a> | <a href="/breakdown">View Sentiment Breakdown</a></h4>
     </center>
     <div id="chart"></div>
     <script>
@@ -86,18 +86,18 @@ tooltip.append('div')
 
 tooltip.append('div')                        
   .attr('class', 'percent');                 
-	var dataset = {{data| safe}}
-	var total = 0
-	for (var i = 0; i < dataset.length; i++) {
-	    total += dataset[i].value;
-	}
-	console.log(total)
+  var dataset = {{data| safe}}
+  var total = 0
+  for (var i = 0; i < dataset.length; i++) {
+      total += dataset[i].value;
+  }
+  console.log(total)
 
         var width = 360;
         var height = 360;
         var radius = Math.min(width, height) / 2;
 
-        var color = d3.scaleOrdinal(d3.schemeCategory20c);
+        var color = d3.scaleOrdinal(d3.schemeCategory10);
 
         var svg = d3.select('#chart')
           .append('svg')
@@ -118,7 +118,7 @@ tooltip.append('div')
           .sort(null);
 
         var legendRectSize = 18;
-	var legendSpacing = 4;
+  var legendSpacing = 4;
         
         var path = svg.selectAll('path')
           .data(pie(dataset))
@@ -126,8 +126,14 @@ tooltip.append('div')
           .append('path')
           .attr('d', arc)
           .attr('fill', function(d, i) { 
-            return color(d.data.sala);
-          
+      return color(d.data.sala);
+          /*  if (d.data.sala === "Positive") {
+              return "steelblue"
+            } else if (d.data.sala === "Neutral") {
+              return "slateblue"
+            }
+            return "maroon"
+          */
           });
         
         path.on('mouseover', function(d) {
@@ -161,16 +167,16 @@ tooltip.append('div')
         legend.append('rect')
   .attr('width', legendRectSize)
   .attr('height', legendRectSize)
-  .style('fill', color)
-  .style('stroke', color);
+  .attr('fill', color)
+  .attr('stroke', color);
         
         legend.data(dataset).append('text')
   .attr('x', legendRectSize + legendSpacing)
   .attr('y', legendRectSize - legendSpacing)
   .text(function(d) {
-	var percent = Math.round(1000 * d.value/total)/10 
-	var output = d.sala + ": " 
-	return output + percent.toString() + "%"
+  var percent = Math.round(1000 * d.value/total)/10 
+  var output = d.sala + ": " 
+  return output + percent.toString() + "%"
 
      });
 
@@ -188,5 +194,4 @@ tooltip.append('div')
 </body>
 
 </html>
-
 
