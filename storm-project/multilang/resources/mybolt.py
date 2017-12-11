@@ -7,9 +7,9 @@ import json
 from afinn import Afinn
 
 #Enter AWS Credentials
-ACCESS_KEY="AKIAIFSRDSL2NLJTZD7Q" 
-SECRET_KEY="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"
-REGION="us-east-1"
+ACCESS_KEY="" 
+SECRET_KEY=""
+REGION=""
 
 # Get the table
 dynamodb = boto3.resource('dynamodb', aws_access_key_id=ACCESS_KEY,
